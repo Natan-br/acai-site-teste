@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<!--
+  =====================================================
+  ARQUIVO: index.html  (a única página do site)
+
+  O QUE É?
+  Só a ESTRUTURA da página (HTML). O visual fica no CSS e o
+  funcionamento no JavaScript. Textos da loja, cardápio, imagens
+  e cores NÃO ficam aqui — ficam nestes arquivos:
+
+    QUERO MUDAR...            ABRA...
+    ------------------------  --------------------
+    Imagens (banner, ícone,   js/imagens.js   <-- TROCAR IMAGEM É AQUI
+      fotos do cardápio)
+    Nome, WhatsApp, endereço, js/config.js
+      horário, taxa, cupons
+    Produtos, preços, cremes, js/cardapio.js
+      complementos
+    Cores                     css/cores.css
+    Tamanhos e layout         css/estilo.css
+
+  O nome da loja, os produtos e as imagens são preenchidos
+  automaticamente pelos arquivos da pasta js/.
+  =====================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!--
+    SEGURANÇA: Content Security Policy.
+    Só permite scripts, estilos e imagens do próprio site.
+    Isso reduz o estrago caso alguém tente injetar código (XSS).
+    Se um dia usar imagens de outro site (ex.: um CDN), inclua o
+    endereço dele em img-src.
+  -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- SEO: o título e a descrição são atualizados por js/topo-e-rodape.js com o nome da loja -->
+  <title>Açaíteria — Faça seu pedido online</title>
+  <meta name="description" content="Veja o cardápio e monte seu açaí do seu jeito. Peça pelo site e finalize pelo WhatsApp.">
+  <meta name="theme-color" content="#7511c9">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Açaíteria — Faça seu pedido online">
+  <meta property="og:description" content="Veja o cardápio e monte seu açaí do seu jeito.">
+
+  <!-- Ícone da aba: o caminho real é definido em js/imagens.js (favicon) -->
+  <link rel="icon" href="imagens/icone/favicon.png">
+  <link rel="stylesheet" href="css/cores.css">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+  <a class="pular-conteudo" href="#cardapio">Ir para o cardápio</a>
+
+  <!-- ================= BARRA ROXA DE NAVEGAÇÃO ================= -->
+  <header class="topo">
+    <nav class="container topo__menu" aria-label="Menu principal">
+      <a href="#" class="topo__link topo__link--ativo" id="nav-inicio">
+        <span aria-hidden="true">🏠</span> Início
+      </a>
+      <button type="button" class="topo__link" id="nav-promocoes" hidden>
+        <span aria-hidden="true">🏷️</span> Promoções
+      </button>
+      <button type="button" class="topo__link" id="nav-pedidos">
+        <span aria-hidden="true">🛍️</span> Pedidos
+      </button>
+    </nav>
+  </header>
+
+  <!-- ================= BANNER + PERFIL DA LOJA ================= -->
+  <div class="container capa">
+    <!-- Banner: a imagem vem de js/imagens.js (banner).
+         O tamanho/proporção dele é ajustado em css/estilo.css (.capa__banner). -->
+    <div class="capa__banner" id="capa-banner">
+      <img id="banner" class="capa__imagem" src="" alt="" width="1536" height="1024" fetchpriority="high">
+    </div>
+
+    <div class="perfil">
+      <div class="perfil__logo">
+        <img id="logo" src="" alt="" width="150" height="150">
+      </div>
+      <div class="perfil__texto">
+        <h1 id="nome-loja" class="perfil__nome">Nome da Loja</h1>
+        <p class="perfil__status">
+          <span id="status-aberto" class="status"></span>
+          <span class="ponto" aria-hidden="true">•</span>
+          <span id="perfil-cidade"></span>
+          <span class="ponto" aria-hidden="true">•</span>
+          <button type="button" class="link-botao" id="abrir-info">Mais informações</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CONTEÚDO: CARDÁPIO + SACOLA ================= -->
+  <div class="container layout">
+
+    <main>
+      <!-- Categorias e busca -->
+      <div class="ferramentas">
+        <label class="ferramentas__busca">
+          <span class="sr-only">O que você procura hoje?</span>
+          <input type="search" id="busca" placeholder="O que você procura hoje?" maxlength="40" autocomplete="off">
+        </label>
+        <!-- Abas de categoria: criadas por js/vitrine.js a partir de CATEGORIAS (js/cardapio.js) -->
+        <nav class="abas" id="categorias" aria-label="Categorias do cardápio"></nav>
+      </div>
+      <section id="cardapio" aria-label="Cardápio">
+        <p id="estado-carregando" class="aviso">Carregando cardápio…</p>
+        <div id="lista-produtos"></div>
+      </section>
+    </main>
+
+    <!-- Sacola fixa na lateral (só aparece em telas grandes) -->
+    <aside class="lateral" aria-label="Sua sacola">
+      <button type="button" class="lateral__entrega" id="lateral-entrega">
+        <span aria-hidden="true">📍</span>
+        <span id="lateral-entrega-texto">Taxa e tempo de entrega</span>
+        <span aria-hidden="true">›</span>
+      </button>
+
+      <div class="sacola">
+        <div id="sacola-vazia" class="sacola__vazia">
+          <span class="sacola__icone" aria-hidden="true">🛍️</span>
+          <p>Sacola vazia</p>
+        </div>
+        <div id="sacola-cheia" hidden>
+          <h2 class="sacola__titulo">Sua sacola</h2>
+          <ul id="sacola-itens" class="sacola__itens"></ul>
+        </div>
+
+        <button type="button" class="sacola__cupom" id="abrir-cupom">
+          <span aria-hidden="true">🎟️</span>
+          <span class="sacola__cupom-texto">
+            <strong id="cupom-titulo">Tem um cupom?</strong>
+            <small id="cupom-sub">Clique e insira o código</small>
+          </span>
+          <span aria-hidden="true">›</span>
+        </button>
+
+        <div class="sacola__rodape">
+          <p class="sacola__total" id="sacola-linha-total" hidden><span>Subtotal</span> <strong id="sacola-total">R$ 0,00</strong></p>
+          <button type="button" class="botao botao--centro" id="sacola-finalizar" disabled>Sacola vazia</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ================= RODAPÉ ================= -->
+  <footer class="rodape">
+    <div class="container">
+      <p id="rodape-endereco"></p>
+      <p id="rodape-contato"></p>
+      <p class="rodape__copy" id="rodape-copy"></p>
+    </div>
+  </footer>
+
+  <!-- ================= BARRA FIXA DO CARRINHO (só no celular) ================= -->
+  <div class="barra-carrinho" id="barra-carrinho" hidden>
+    <button type="button" class="botao botao--grande" id="abrir-carrinho">
+      <span>Ver meu pedido (<span id="barra-qtd">0</span>)</span>
+      <strong id="barra-total">R$ 0,00</strong>
+    </button>
+  </div>
+
+  <!-- ================= JANELA: MAIS INFORMAÇÕES ================= -->
+  <dialog id="dlg-info" class="janela" aria-labelledby="info-titulo">
+    <form method="dialog" class="janela__cab">
+      <h2 id="info-titulo">Informações da loja</h2>
+      <button class="janela__fechar" aria-label="Fechar">✕</button>
+    </form>
+    <div class="janela__corpo">
+      <dl class="info-lista" id="info-lista"></dl>
+    </div>
+  </dialog>
+
+  <!-- ================= JANELA: MONTAR O PRODUTO ================= -->
+  <dialog id="dlg-produto" class="janela janela--produto" aria-labelledby="produto-cab-titulo">
+    <div class="produto-layout">
+      <!-- Esquerda: fotos do produto (some se o produto não tiver foto, no celular) -->
+      <div class="galeria" id="galeria">
+        <div class="galeria__faixa" id="galeria-faixa"></div>
+        <div class="galeria__pontos" id="galeria-pontos"></div>
+      </div>
+
+      <!-- Direita: detalhes e opções -->
+      <div class="produto-painel">
+        <form method="dialog" class="janela__cab">
+          <h2 id="produto-cab-titulo">Detalhes do produto</h2>
+          <button class="janela__fechar janela__fechar--redondo" aria-label="Fechar">✕</button>
+        </form>
+        <div class="janela__corpo janela__corpo--solto">
+          <div class="produto-info">
+            <h3 id="produto-titulo"></h3>
+            <p id="produto-descricao" class="produto-info__desc"></p>
+            <p id="produto-preco-base" class="produto-info__preco"></p>
+          </div>
+          <div id="produto-grupos"></div>
+          <label class="campo produto-obs" for="produto-obs">
+            <span>Alguma observação? (opcional)</span>
+            <textarea id="produto-obs" rows="2" maxlength="200" placeholder="Ex.: sem granola, pouco leite condensado"></textarea>
+          </label>
+          <p id="produto-erro" class="erro" role="alert" hidden></p>
+        </div>
+        <div class="janela__rodape">
+          <div class="quantidade">
+            <button type="button" id="qtd-menos" aria-label="Diminuir quantidade">−</button>
+            <output id="qtd-valor" aria-live="polite">1</output>
+            <button type="button" id="qtd-mais" aria-label="Aumentar quantidade">+</button>
+          </div>
+          <button type="button" class="botao botao--entre" id="adicionar-item">
+            <span>Adicionar</span> <span id="produto-total">R$ 0,00</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ================= JANELA: CUPOM ================= -->
+  <dialog id="dlg-cupom" class="janela" aria-labelledby="cupom-janela-titulo">
+    <form method="dialog" class="janela__cab">
+      <h2 id="cupom-janela-titulo">Cupom de desconto</h2>
+      <button class="janela__fechar" aria-label="Fechar">✕</button>
+    </form>
+    <form id="form-cupom" class="janela__corpo" novalidate>
+      <label class="campo" for="cupom-codigo">
+        <span>Código do cupom</span>
+        <input id="cupom-codigo" type="text" maxlength="20" autocomplete="off" autocapitalize="characters">
+      </label>
+      <p id="cupom-msg" class="erro" role="alert" hidden></p>
+      <button type="submit" class="botao botao--centro">Aplicar cupom</button>
+      <button type="button" class="botao botao--claro botao--centro" id="remover-cupom" hidden>Remover cupom</button>
+    </form>
+  </dialog>
+
+  <!-- ================= JANELA: CARRINHO E FINALIZAÇÃO ================= -->
+  <dialog id="dlg-carrinho" class="janela" aria-labelledby="carrinho-titulo">
+    <form method="dialog" class="janela__cab">
+      <h2 id="carrinho-titulo">Seu pedido</h2>
+      <button class="janela__fechar" aria-label="Fechar">✕</button>
+    </form>
+
+    <div class="janela__corpo">
+      <ul id="carrinho-itens" class="carrinho-itens"></ul>
+      <p id="carrinho-vazio" class="aviso" hidden>Seu pedido está vazio. Escolha um produto no cardápio.</p>
+
+      <form id="form-pedido" novalidate>
+        <fieldset class="campo-grupo">
+          <legend>Como você quer receber?</legend>
+          <label class="opcao"><input type="radio" name="tipo" value="entrega" checked> <span id="rotulo-entrega">Entrega</span></label>
+          <label class="opcao"><input type="radio" name="tipo" value="retirada"> <span>Retirar na loja</span></label>
+        </fieldset>
+
+        <label class="campo" for="cliente-nome">
+          <span>Seu nome <b aria-hidden="true">*</b></span>
+          <input id="cliente-nome" name="nome" type="text" maxlength="60" autocomplete="name" required>
+          <small class="erro" data-erro-de="nome" hidden></small>
+        </label>
+
+        <div id="bloco-endereco">
+          <label class="campo" for="cliente-endereco">
+            <span>Endereço de entrega <b aria-hidden="true">*</b></span>
+            <input id="cliente-endereco" name="endereco" type="text" maxlength="150" autocomplete="street-address" placeholder="Rua, número, bairro">
+            <small class="erro" data-erro-de="endereco" hidden></small>
+          </label>
+          <label class="campo" for="cliente-referencia">
+            <span>Ponto de referência (opcional)</span>
+            <input id="cliente-referencia" name="referencia" type="text" maxlength="100">
+          </label>
+        </div>
+
+        <label class="campo" for="cliente-pagamento">
+          <span>Forma de pagamento <b aria-hidden="true">*</b></span>
+          <select id="cliente-pagamento" name="pagamento" required></select>
+          <small class="erro" data-erro-de="pagamento" hidden></small>
+        </label>
+
+        <label class="campo" id="bloco-troco" for="cliente-troco" hidden>
+          <span>Troco para quanto? (opcional)</span>
+          <input id="cliente-troco" name="troco" type="text" inputmode="decimal" maxlength="10" placeholder="Ex.: 50">
+        </label>
+
+        <dl class="resumo">
+          <div><dt>Subtotal</dt><dd id="resumo-subtotal">R$ 0,00</dd></div>
+          <div id="linha-desconto" hidden><dt id="resumo-desconto-rotulo">Desconto</dt><dd id="resumo-desconto">R$ 0,00</dd></div>
+          <div id="linha-entrega"><dt>Taxa de entrega</dt><dd id="resumo-entrega">R$ 0,00</dd></div>
+          <div class="resumo__total"><dt>Total</dt><dd id="resumo-total">R$ 0,00</dd></div>
+        </dl>
+
+        <p class="texto-suave" id="aviso-whatsapp"></p>
+        <p id="pedido-erro" class="erro" role="alert" hidden></p>
+
+        <button type="submit" class="botao botao--grande" id="enviar-pedido">Enviar pedido pelo WhatsApp</button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- =====================================================
+       SCRIPTS (ficam no fim para a página aparecer mais rápido)
+
+       A ORDEM IMPORTA: um arquivo usa o que os anteriores criaram.
+       Se criar um arquivo .js novo, coloque-o ANTES de main.js.
+
+       DADOS (é aqui que você edita no dia a dia)
+         config.js ........ nome, WhatsApp, endereço, horário, taxa, cupons
+         imagens.js ....... TODAS as imagens do site
+         cardapio.js ...... categorias, produtos, cremes, complementos, preços
+
+       FUNCIONAMENTO (normalmente não precisa mexer)
+         utilitarios.js ... ferramentas pequenas (formatar preço, etc.)
+         estado.js ........ carrinho e o que está aberto no momento
+         precos.js ........ cálculo de preços
+         cupom.js ......... cupom de desconto
+         topo-e-rodape.js . topo, rodapé, "Aberto/Fechado", mais informações
+         vitrine.js ....... abas, busca, destaques e cartões de produto
+         produto.js ....... janela do produto (fotos e opções)
+         sacola.js ........ sacola e resumo do pedido
+         pedido.js ........ formulário e mensagem do WhatsApp
+         main.js .......... liga tudo (sempre o último)
+       ===================================================== -->
+  <script src="js/config.js"></script>
+  <script src="js/imagens.js"></script>
+  <script src="js/cardapio.js"></script>
+  <script src="js/utilitarios.js"></script>
+  <script src="js/estado.js"></script>
+  <script src="js/precos.js"></script>
+  <script src="js/cupom.js"></script>
+  <script src="js/topo-e-rodape.js"></script>
+  <script src="js/vitrine.js"></script>
+  <script src="js/produto.js"></script>
+  <script src="js/sacola.js"></script>
+  <script src="js/pedido.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

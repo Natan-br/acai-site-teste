@@ -1,0 +1,20 @@
+PASTA DE IMAGENS
+================
+
+banner/    Banner grande do topo.            1536 x 1024 px (3:2) ou 1920 x 1080 (16:9), JPG
+icone/     Logo da loja e ícone da aba.      512 x 512 px / 192 x 192 px, PNG
+cardapio/  Fotos dos produtos.               960 x 640 px (3:2), JPG
+sistema/   Ícones internos do site (lupa).   NÃO MEXA
+
+COMO TROCAR UMA IMAGEM
+1. Coloque o arquivo novo na pasta certa.
+2. Abra js/imagens.js e mude o caminho da imagem.
+   (Ou use um arquivo com o MESMO NOME do antigo e nem precisa mexer no js/imagens.js.)
+3. Salve e atualize a página (F5).
+
+REGRAS
+- Nome de arquivo sem espaço e sem acento: copo-acai-300ml.jpg
+- Mantenha a proporção 3:2 nas fotos do cardápio e no banner.
+- Arquivos leves (até ~200 KB) deixam o site mais rápido no celular.
+- A imagem cardapio/promocao-copo-400ml.jpg tem o preço R$ 16,00 desenhado nela:
+  se mudar o preço do produto, troque a imagem.

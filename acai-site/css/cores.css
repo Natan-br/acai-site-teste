@@ -1,0 +1,38 @@
+/* =====================================================
+   ARQUIVO: css/cores.css
+
+   CORES DO SITE
+
+   QUER ALTERAR A COR DO SITE?
+   MEXA SOMENTE NESTAS VARIÁVEIS.
+   Salve o arquivo e atualize a página (F5).
+   ===================================================== */
+
+:root {
+  /* COR PRINCIPAL: barra do topo, botões, preços em destaque.
+     Se quiser mudar a cor dos botões, altere esta linha. */
+  --cor-principal: #7511c9;
+
+  /* Versão mais escura da principal (usada quando passa o mouse no botão) */
+  --cor-principal-escura: #5b0d9c;
+
+  /* COR DE DESTAQUE: detalhes e foco do teclado */
+  --cor-destaque: #f59e0b;
+
+  /* Texto em cima da cor principal (ex.: letra branca no botão roxo).
+     Se escolher uma cor principal CLARA, troque para uma cor escura. */
+  --cor-texto-sobre-principal: #ffffff;
+
+  /* TEXTOS */
+  --cor-texto: #1f2937;
+  --cor-texto-suave: #6b7280;
+
+  /* FUNDOS */
+  --cor-fundo: #f3f4f6;
+  --cor-fundo-cartao: #ffffff;
+  --cor-borda: #e5e7eb;
+
+  /* MENSAGENS */
+  --cor-sucesso: #16a34a;   /* também usada em "Aberto" */
+  --cor-erro: #b91c1c;      /* também usada em "Fechado" */
+}

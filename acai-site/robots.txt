@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+# Troque pelo endereço real quando publicar:
+# Sitemap: https://SEU-SITE.com.br/sitemap.xml
